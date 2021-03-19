@@ -1,0 +1,66 @@
+name: build
+
+on:
+  pull_request:
+  push:
+    branches:
+      - '**'
+      - '!trunk'
+
+jobs:
+  debug_build_and_checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          components: clippy
+
+      - uses: actions-rs/cargo@v1
+        name: cargo build
+        with:
+          command: build
+
+      - uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  release_build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+
+      - uses: actions-rs/cargo@v1
+        name: cargo build
+        with:
+          command: build
+          args: --release
+
+  rustfmt:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+          profile: minimal
+          components: rustfmt
+
+      - uses: actions-rs/cargo@v1
+        name: cargo fmt
+        with:
+          command: fmt
+          args: -- --check

@@ -1,0 +1,18 @@
+[package]
+name = "uniqtoo"
+version = "0.1.0"
+authors = ["Jake Wharton <uniqtoo@jakewharton.com>"]
+edition = "2018"
+license = "Apache-2.0"
+description = "A rewrite of uniq with real-time output for count (-c) usage."
+readme = "README.md"
+repository = "https://github.com/JakeWharton/uniqtoo/"
+categories = ["command-line-utilities"]
+exclude = [".github/**"]
+
+[dependencies]
+structopt = "0.3"
+
+[profile.release]
+lto = true
+codegen-units = 1
