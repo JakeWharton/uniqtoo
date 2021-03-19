@@ -88,6 +88,24 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - uses: crazy-max/ghaction-docker-meta@v1
+        id: docker_meta
+        with:
+          images: |
+            jakewharton/uniqtoo
+            ghcr.io/jakewharton/uniqtoo
+          tag-semver: |
+            {{version}}
+            {{major}}
+            {{major}}.{{minor}}
+
+      - uses: docker/login-action@v1
+        with:
+          username: jakewharton
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      - run: echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
@@ -98,6 +116,12 @@ jobs:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
         with:
           command: publish
+
+      - uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          labels: ${{ steps.docker_meta.outputs.labels }}
 
       - uses: ffurrer2/extract-release-notes@v1
         id: release_notes
