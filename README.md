@@ -7,12 +7,17 @@ A version of `sort | uniq -c` with output that updates in real-time as each line
 
 Pipe something line-based into `uniqtoo` the same as you would into `sort | uniq -c`.
 
-![](demo.svg)
+![An animated example of piping a command into uniqtoo](demo.svg)
 
+You can also supply the input as a file or file descriptor as an argument.
+
+```
+$ uniqtoo input.txt
+```
 
 ## Install
 
-Currently, the only distribution mechanism is via `cargo`.
+### Rust / Cargo
 
 ```
 $ cargo install uniqtoo
@@ -20,6 +25,22 @@ $ cargo install uniqtoo
 
 [![Latest version](https://img.shields.io/crates/v/uniqtoo.svg)](https://crates.io/crates/uniqtoo)
 
+The binary will be placed in your `~/.cargo/bin` which should be on your shell's `$PATH`.
+
+### Docker
+
+A container with the binary is available from Docker Hub and GitHub Container Registry.
+
+ * `jakewharton/uniqtoo` [![Docker Image Version](https://img.shields.io/docker/v/jakewharton/uniqtoo?sort=semver)][hub]
+ * `ghcr.io/jakewharton/uniqtoo`
+
+[hub]: https://hub.docker.com/r/jakewharton/uniqtoo/
+
+Use `docker run` instead of directly using the binary.
+
+```
+input_command | docker run -i -a STDIN -a STDOUT jakewharton/uniqtoo
+```
 
 ## License
 
