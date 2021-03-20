@@ -5,5 +5,7 @@ sleep 1
 echo 'git ls-files | xargs -L1 sh -c '"'"'sleep .5 && echo "${0##*.}"'"'"' | uniqtoo'
 
 git ls-files | xargs -L1 sh -c 'sleep .5 && echo "${0##*.}"' | ./target/debug/uniqtoo
+echo
+printf '\e[34m$\e[0m '
 sleep 2
 echo

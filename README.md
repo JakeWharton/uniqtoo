@@ -7,6 +7,8 @@ A version of `sort | uniq -c` with output that updates in real-time as each line
 
 Pipe something line-based into `uniqtoo` the same as you would into `sort | uniq -c`.
 
+Here is an example counting the extensions of files in this repository with a 0.5s delay in between.
+
 ![An animated example of piping a command into uniqtoo](demo.svg)
 
 You can also supply the input as a file or file descriptor as an argument.

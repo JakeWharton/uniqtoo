@@ -8,4 +8,4 @@ fi
 set -e
 
 cargo build
-svg-term "--command=./demo-script.sh" "--out=demo.svg" --from=10 --window --width=80 --height=10 --no-cursor
+svg-term "--command=./demo-script.sh" "--out=demo.svg" --from=10 --window --width=80 --height=15 --no-cursor
