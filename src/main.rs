@@ -15,14 +15,8 @@ fn main() {
 		dbg!(&args);
 	}
 
-	if !args.count
-		|| args.case_insensitive
-		|| args.duplicated_only
-		|| args.unique_only
-		|| args.ignore_char_count > 0
-		|| args.ignore_field_count > 0
-	{
-		eprintln!("Only -c is supported right now");
+	if args.case_insensitive || args.ignore_char_count > 0 || args.ignore_field_count > 0 {
+		eprintln!("-i, -f, and -s are not supported yet. Sorry!");
 		exit(2);
 	}
 
@@ -68,19 +62,6 @@ fn main() {
 
 #[derive(Debug, StructOpt)]
 struct Args {
-	/// Precede each output line with the count of the number of times the line occurred in the input,
-	/// followed by a single space.
-	#[structopt(short)]
-	count: bool,
-
-	/// Only output lines that are repeated in the input.
-	#[structopt(short = "d")]
-	duplicated_only: bool,
-
-	/// Only output lines that are not repeated in the input.
-	#[structopt(short = "u")]
-	unique_only: bool,
-
 	/// Case insensitive comparison of lines.
 	#[structopt(short = "i")]
 	case_insensitive: bool,

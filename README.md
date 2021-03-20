@@ -1,8 +1,14 @@
 # `uniqtoo`
 
-A rewrite of `uniq` in Rust with real-time output for count (`-c`) usage.
+A version of `sort | uniq -c` with output that updates in real-time as each line is parsed.
 
-At present `-c` is required, and the only flag supported.
+
+## Usage
+
+Pipe something line-based into `uniqtoo` the same as you would into `sort | uniq -c`.
+
+![](demo.svg)
+
 
 ## Install
 

@@ -1,10 +1,10 @@
 [package]
 name = "uniqtoo"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Jake Wharton <uniqtoo@jakewharton.com>"]
 edition = "2018"
 license = "Apache-2.0"
-description = "A rewrite of uniq with real-time output for count (-c) usage."
+description = "A version of `sort | uniq -c` with output that updates in real-time as each line is parsed"
 readme = "README.md"
 repository = "https://github.com/JakeWharton/uniqtoo/"
 categories = ["command-line-utilities"]
