@@ -15,8 +15,8 @@ fn main() {
 		dbg!(&args);
 	}
 
-	if args.case_insensitive || args.ignore_char_count > 0 || args.ignore_field_count > 0 {
-		eprintln!("-i, -f, and -s are not supported yet. Sorry!");
+	if args.ignore_char_count > 0 || args.ignore_field_count > 0 {
+		eprintln!("-f and -s are not supported yet. Sorry!");
 		exit(2);
 	}
 
@@ -33,6 +33,11 @@ fn main() {
 	let mut last_height = 0;
 	for line in input.lines() {
 		let line = line.unwrap();
+		let line = if args.case_insensitive {
+			line.to_lowercase()
+		} else {
+			line
+		};
 		if args.debug {
 			dbg!(&line);
 		}
