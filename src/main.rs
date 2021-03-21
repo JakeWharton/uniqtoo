@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::fs::File;
 use std::io::stdin;
 use std::io::stdout;
@@ -8,6 +7,9 @@ use std::io::BufWriter;
 use std::io::Write;
 use std::process::exit;
 use structopt::StructOpt;
+
+mod counter;
+use counter::Counter;
 
 fn main() {
 	let args: Args = Args::from_args();
@@ -29,20 +31,19 @@ fn main() {
 		Some(filename) => Box::new(BufWriter::new(File::open(filename).unwrap())),
 	};
 
-	let mut counts: HashMap<String, u32> = HashMap::new();
+	let mut counter = Counter::new();
 	let mut last_height = 0;
 	for line in input.lines() {
 		let line = line.unwrap();
-		let line = if args.case_insensitive {
-			line.to_lowercase()
+		if args.case_insensitive {
+			counter.count_case_insensitive(&line);
 		} else {
-			line
+			counter.count(&line);
 		};
+
 		if args.debug {
 			dbg!(&line);
 		}
-
-		*counts.entry(line).or_insert(0) += 1;
 
 		if !args.debug {
 			// For each previous line in the output, move the cursor up and clear the line.
@@ -51,7 +52,7 @@ fn main() {
 			}
 		}
 
-		let mut pairs: Vec<(&String, &u32)> = counts.iter().collect();
+		let mut pairs: Vec<(&String, &u32)> = counter.counts.iter().collect();
 		pairs.sort_by(|a, b| a.1.cmp(b.1).reverse());
 
 		for (line, count) in pairs {
@@ -61,7 +62,7 @@ fn main() {
 		}
 		output.flush().unwrap();
 
-		last_height = counts.len();
+		last_height = counter.counts.len();
 	}
 }
 
