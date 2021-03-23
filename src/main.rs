@@ -9,6 +9,7 @@ use std::process::exit;
 use structopt::StructOpt;
 
 mod counter;
+use counter::Config;
 use counter::Counter;
 
 fn main() {
@@ -31,15 +32,16 @@ fn main() {
 		Some(filename) => Box::new(BufWriter::new(File::open(filename).unwrap())),
 	};
 
-	let mut counter = Counter::new();
+	let config = Config {
+		case_insensitive: args.case_insensitive,
+		ignore_field_count: args.ignore_field_count,
+		ignore_char_count: args.ignore_char_count,
+	};
+	let mut counter = Counter::new(config);
 	let mut last_height = 0;
 	for line in input.lines() {
 		let line = line.unwrap();
-		if args.case_insensitive {
-			counter.count_case_insensitive(&line);
-		} else {
-			counter.count(&line);
-		};
+		counter.count(&line);
 
 		if args.debug {
 			dbg!(&line);
