@@ -1,23 +1,33 @@
 use std::collections::HashMap;
 
+#[derive(Default)]
+pub struct Config {
+	pub case_insensitive: bool,
+	pub ignore_field_count: u32,
+	pub ignore_char_count: u32,
+}
+
 pub struct Counter {
 	pub counts: HashMap<String, u32>,
+	config: Config,
 }
 
 impl Counter {
-	pub fn new() -> Counter {
+	pub fn new(config: Config) -> Counter {
 		Counter {
 			counts: HashMap::new(),
+			config,
 		}
 	}
 
 	pub fn count(&mut self, line: &str) {
-		*self.counts.entry(line.to_string()).or_insert(0) += 1;
-	}
+		let line = if self.config.case_insensitive {
+			line.to_lowercase()
+		} else {
+			line.to_string()
+		};
 
-	pub fn count_case_insensitive(&mut self, line: &str) {
-		let line = line.to_lowercase();
-		self.count(&line);
+		*self.counts.entry(line).or_insert(0) += 1;
 	}
 }
 
@@ -32,16 +42,17 @@ test
 Test
 test";
 
-		let mut counter = Counter::new();
+		let config = Default::default();
+		let mut counter = Counter::new(config);
 		for line in input.lines() {
 			counter.count(line);
 		}
 
-		let mut result: HashMap<String, u32> = HashMap::new();
-		result.insert("test".to_string(), 2);
-		result.insert("Test".to_string(), 1);
+		let mut expected = HashMap::new();
+		expected.insert("test".to_string(), 2);
+		expected.insert("Test".to_string(), 1);
 
-		assert_eq!(result, counter.counts);
+		assert_eq!(expected, counter.counts);
 	}
 
 	#[test]
@@ -51,14 +62,18 @@ test
 Test
 test";
 
-		let mut counter = Counter::new();
+		let config = Config {
+			case_insensitive: true,
+			..Default::default()
+		};
+		let mut counter = Counter::new(config);
 		for line in input.lines() {
-			counter.count_case_insensitive(line);
+			counter.count(line);
 		}
 
-		let mut result: HashMap<String, u32> = HashMap::new();
-		result.insert("test".to_string(), 3);
+		let mut expected = HashMap::new();
+		expected.insert("test".to_string(), 3);
 
-		assert_eq!(result, counter.counts);
+		assert_eq!(expected, counter.counts);
 	}
 }
