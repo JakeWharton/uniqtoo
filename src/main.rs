@@ -18,8 +18,8 @@ fn main() {
 		dbg!(&args);
 	}
 
-	if args.ignore_char_count > 0 || args.ignore_field_count > 0 {
-		eprintln!("-f and -s are not supported yet. Sorry!");
+	if args.ignore_char_count > 0 {
+		eprintln!("-s is not supported yet. Sorry!");
 		exit(2);
 	}
 
@@ -78,13 +78,13 @@ struct Args {
 	/// non-blank characters separated from adjacent fields by blanks. Field numbers are one based,
 	/// i.e., the first field is field one.
 	#[structopt(short = "f", default_value = "0", name = "num")]
-	ignore_field_count: u32,
+	ignore_field_count: usize,
 
 	/// Ignore the first chars characters in each input line when doing comparisons. If specified in
 	/// conjunction with the -f option, the first chars characters after the first num fields will be
 	/// ignored.  Character numbers are one based, i.e., the first character is character one.
 	#[structopt(short = "s", default_value = "0", name = "chars")]
-	ignore_char_count: u32,
+	ignore_char_count: usize,
 
 	/// The input file to read, or "-" indicating to read stdin. If omitted, stdin will be used.
 	input_file: Option<String>,

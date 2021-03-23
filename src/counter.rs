@@ -3,8 +3,8 @@ use std::collections::HashMap;
 #[derive(Default)]
 pub struct Config {
 	pub case_insensitive: bool,
-	pub ignore_field_count: u32,
-	pub ignore_char_count: u32,
+	pub ignore_field_count: usize,
+	pub ignore_char_count: usize,
 }
 
 pub struct Counter {
@@ -21,10 +21,21 @@ impl Counter {
 	}
 
 	pub fn count(&mut self, line: &str) {
+		let line = line.to_string();
+
+		let line = if self.config.ignore_field_count > 0 {
+			line
+				.split_whitespace()
+				.skip(self.config.ignore_field_count)
+				.collect()
+		} else {
+			line
+		};
+
 		let line = if self.config.case_insensitive {
 			line.to_lowercase()
 		} else {
-			line.to_string()
+			line
 		};
 
 		*self.counts.entry(line).or_insert(0) += 1;
@@ -73,6 +84,27 @@ test";
 
 		let mut expected = HashMap::new();
 		expected.insert("test".to_string(), 3);
+
+		assert_eq!(expected, counter.counts);
+	}
+
+	#[test]
+	fn ignore_field() {
+		let input = "\
+A	test
+B	test";
+
+		let config = Config {
+			ignore_field_count: 1,
+			..Default::default()
+		};
+		let mut counter = Counter::new(config);
+		for line in input.lines() {
+			counter.count(line);
+		}
+
+		let mut expected = HashMap::new();
+		expected.insert("test".to_string(), 2);
 
 		assert_eq!(expected, counter.counts);
 	}
