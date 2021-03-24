@@ -32,6 +32,12 @@ impl Counter {
 			line
 		};
 
+		let line = if self.config.ignore_char_count > 0 {
+			line.chars().skip(self.config.ignore_char_count).collect()
+		} else {
+			line
+		};
+
 		let line = if self.config.case_insensitive {
 			line.to_lowercase()
 		} else {
@@ -96,6 +102,49 @@ B	test";
 
 		let config = Config {
 			ignore_field_count: 1,
+			..Default::default()
+		};
+		let mut counter = Counter::new(config);
+		for line in input.lines() {
+			counter.count(line);
+		}
+
+		let mut expected = HashMap::new();
+		expected.insert("test".to_string(), 2);
+
+		assert_eq!(expected, counter.counts);
+	}
+
+	#[test]
+	fn ignore_char() {
+		let input = "\
+A_test
+B_test";
+
+		let config = Config {
+			ignore_char_count: 2,
+			..Default::default()
+		};
+		let mut counter = Counter::new(config);
+		for line in input.lines() {
+			counter.count(line);
+		}
+
+		let mut expected = HashMap::new();
+		expected.insert("test".to_string(), 2);
+
+		assert_eq!(expected, counter.counts);
+	}
+
+	#[test]
+	fn ignore_field_and_char() {
+		let input = "\
+A	A_test
+B	B_test";
+
+		let config = Config {
+			ignore_field_count: 1,
+			ignore_char_count: 2,
 			..Default::default()
 		};
 		let mut counter = Counter::new(config);
