@@ -5,7 +5,6 @@ use std::io::BufRead;
 use std::io::BufReader;
 use std::io::BufWriter;
 use std::io::Write;
-use std::process::exit;
 use structopt::StructOpt;
 
 mod counter;
@@ -16,11 +15,6 @@ fn main() {
 	let args: Args = Args::from_args();
 	if args.debug {
 		dbg!(&args);
-	}
-
-	if args.ignore_char_count > 0 {
-		eprintln!("-s is not supported yet. Sorry!");
-		exit(2);
 	}
 
 	let input: Box<dyn BufRead> = match args.input_file.filter(|it| it != "-") {
