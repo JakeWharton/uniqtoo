@@ -8,8 +8,12 @@ use std::io::Write;
 use structopt::StructOpt;
 
 mod counter;
-use counter::Config;
+use counter::Config as CounterConfig;
 use counter::Counter;
+
+mod output;
+use output::Config as OutputConfig;
+use output::Output;
 
 fn main() {
 	let args: Args = Args::from_args();
@@ -17,48 +21,33 @@ fn main() {
 		dbg!(&args);
 	}
 
-	let input: Box<dyn BufRead> = match args.input_file.as_deref() {
-		None | Some("-") => Box::new(BufReader::new(stdin())),
-		Some(filename) => Box::new(BufReader::new(File::open(filename).unwrap())),
-	};
-	let mut output: Box<dyn Write> = match args.output_file {
-		None => Box::new(BufWriter::new(stdout())),
-		Some(filename) => Box::new(BufWriter::new(File::open(filename).unwrap())),
-	};
-
-	let config = Config {
+	let counter_config = CounterConfig {
 		case_insensitive: args.case_insensitive,
 		ignore_field_count: args.ignore_field_count,
 		ignore_char_count: args.ignore_char_count,
 	};
-	let mut counter = Counter::new(config);
-	let mut last_height = 0;
+	let mut counter = Counter::new(counter_config);
+
+	let input: Box<dyn BufRead> = match args.input_file.as_deref() {
+		None | Some("-") => Box::new(BufReader::new(stdin())),
+		Some(filename) => Box::new(BufReader::new(File::open(filename).unwrap())),
+	};
+
+	let output: Box<dyn Write> = match args.output_file {
+		None => Box::new(BufWriter::new(stdout())),
+		Some(filename) => Box::new(BufWriter::new(File::open(filename).unwrap())),
+	};
+	let output_config = OutputConfig { debug: args.debug };
+	let mut output = Output::new(output, output_config);
+
 	for line in input.lines() {
 		let line = line.unwrap();
-		counter.count(&line);
-
 		if args.debug {
 			dbg!(&line);
 		}
 
-		if !args.debug {
-			// For each previous line in the output, move the cursor up and clear the line.
-			for _ in 0..last_height {
-				output.write_all("\u{001B}[F\u{001B}[K".as_ref()).unwrap();
-			}
-		}
-
-		let mut pairs: Vec<(&String, &u32)> = counter.counts.iter().collect();
-		pairs.sort_by(|a, b| a.1.cmp(b.1).reverse());
-
-		for (line, count) in pairs {
-			output
-				.write_all(format!("{}\t{}\n", count, line).as_ref())
-				.unwrap();
-		}
-		output.flush().unwrap();
-
-		last_height = counter.counts.len();
+		counter.count(&line);
+		output.print(&counter.counts);
 	}
 }
 
