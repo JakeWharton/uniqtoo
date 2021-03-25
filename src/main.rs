@@ -17,8 +17,8 @@ fn main() {
 		dbg!(&args);
 	}
 
-	let input: Box<dyn BufRead> = match args.input_file.filter(|it| it != "-") {
-		None => Box::new(BufReader::new(stdin())),
+	let input: Box<dyn BufRead> = match args.input_file.as_deref() {
+		None | Some("-") => Box::new(BufReader::new(stdin())),
 		Some(filename) => Box::new(BufReader::new(File::open(filename).unwrap())),
 	};
 	let mut output: Box<dyn Write> = match args.output_file {
