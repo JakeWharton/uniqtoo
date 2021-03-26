@@ -1,6 +1,7 @@
 # `uniqtoo`
 
-A version of `sort | uniq -c` with output that updates in real-time as each line is parsed.
+A single binary replicating the behavior of `sort | uniq -c | sort -nr` with output that updates
+in real-time as each line is parsed.
 
 
 ## Usage
