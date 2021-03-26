@@ -5,19 +5,21 @@
    2. Add a link URL to ensure the header link works.
    3. Add a new `Unreleased` section to the top.
 
-2. Commit
+2. Update `Cargo.toml` with the new version.
+
+3. Commit
 
    ```
    $ git commit -am "Prepare version X.Y.X"
    ```
 
-3. Tag
+4. Tag
 
    ```
    $ git tag -am "Version X.Y.Z" X.Y.Z
    ```
 
-4. Push!
+5. Push!
 
    ```
    $ git push && git push --tags
