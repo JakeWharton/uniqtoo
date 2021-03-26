@@ -34,7 +34,7 @@ The binary will be placed in your `~/.cargo/bin` which should be on your shell's
 
 A container with the binary is available from Docker Hub and GitHub Container Registry.
 
- * `jakewharton/uniqtoo` [![Docker Image Version](https://img.shields.io/docker/v/jakewharton/uniqtoo)][hub]
+ * `jakewharton/uniqtoo` [![Docker Image Version](https://img.shields.io/docker/v/jakewharton/uniqtoo?sort=semver)][hub]
  * `ghcr.io/jakewharton/uniqtoo`
 
 [hub]: https://hub.docker.com/r/jakewharton/uniqtoo/
