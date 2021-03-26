@@ -38,7 +38,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 		Some(filename) => Box::new(BufReader::new(File::open(filename)?)),
 	};
 
-	let output: Box<dyn Write> = match args.output_file {
+	let mut output: Box<dyn Write> = match args.output_file {
 		None => Box::new(BufWriter::new(stdout())),
 		Some(filename) => Box::new(BufWriter::new(File::open(filename)?)),
 	};
@@ -47,7 +47,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 		head: args.limit,
 		debug: args.debug,
 	};
-	let mut output = Output::new(output, output_config);
+	let mut output = Output::new(Box::new(output.as_mut()), output_config);
 
 	for line in input.lines() {
 		let line = line?;

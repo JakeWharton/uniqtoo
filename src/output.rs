@@ -8,14 +8,14 @@ pub struct Config {
 	pub debug: bool,
 }
 
-pub struct Output {
-	sink: Box<dyn Write>,
+pub struct Output<'a> {
+	sink: Box<&'a mut dyn Write>,
 	config: Config,
 	last_height: usize,
 }
 
-impl Output {
-	pub fn new(sink: Box<dyn Write>, config: Config) -> Output {
+impl<'a> Output<'a> {
+	pub fn new(sink: Box<&mut dyn Write>, config: Config) -> Output {
 		Output {
 			sink,
 			config,
@@ -62,10 +62,32 @@ mod tests {
 
 	#[test]
 	fn print_prints() {
-		// TODO!
 		//  add item to map
+		let mut counts = HashMap::new();
+		counts.insert("A".to_string(), 2);
+		counts.insert("B".to_string(), 1);
+		counts.insert("C".to_string(), 3);
+
 		//  print
+		let config = Config {
+			reverse: false,
+			head: None,
+			debug: false,
+		};
+		let mut sink = Vec::new();
+		let mut output = Output::new(Box::new(&mut sink), config);
+
+		output.print(&counts).unwrap();
+
 		//  validate output is sorted
+		let expected = "\
+3	C
+2	A
+1	B
+"
+		.to_string();
+
+		assert_eq!(expected, String::from_utf8(sink).unwrap());
 	}
 
 	#[test]
