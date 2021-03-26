@@ -2,6 +2,8 @@ use std::collections::HashMap;
 use std::io::Write;
 
 pub struct Config {
+	pub reverse: bool,
+	pub head: Option<usize>,
 	pub debug: bool,
 }
 
@@ -22,7 +24,17 @@ impl Output {
 
 	pub fn print(&mut self, counts: &HashMap<String, u32>) {
 		let mut pairs: Vec<(&String, &u32)> = counts.iter().collect();
-		pairs.sort_by(|a, b| a.1.cmp(b.1).reverse());
+
+		// Sort items with higher counts to the top.
+		pairs.sort_by(|a, b| b.1.cmp(a.1));
+
+		if self.config.reverse {
+			pairs.reverse();
+		}
+
+		if let Some(head) = self.config.head {
+			pairs.truncate(head);
+		}
 
 		if !self.config.debug {
 			// For each previous line in the output, move the cursor up and clear the line.
@@ -31,7 +43,7 @@ impl Output {
 				.write_all("\u{001B}[F\u{001B}[K".repeat(self.last_height).as_ref())
 				.unwrap();
 		}
-		for (line, count) in pairs {
+		for (line, count) in &pairs {
 			self
 				.sink
 				.write_all(format!("{}\t{}\n", count, line).as_ref())
@@ -39,7 +51,7 @@ impl Output {
 		}
 		self.sink.flush().unwrap();
 
-		self.last_height = counts.len();
+		self.last_height = pairs.len();
 	}
 }
 
@@ -52,7 +64,16 @@ mod tests {
 		// TODO!
 		//  add item to map
 		//  print
-		//  validate output
+		//  validate output is sorted
+	}
+
+	#[test]
+	fn print_reverse() {
+		// TODO!
+		//  config { reverse: true }
+		//  add item to map
+		//  print
+		//  validate output is sorted in reverse
 	}
 
 	#[test]
@@ -63,6 +84,30 @@ mod tests {
 		//  add new item to map
 		//  print
 		//  validate ANSI codes
+	}
+
+	#[test]
+	fn head_limits_output() {
+		// TODO!
+		//  config { head: 2 }
+		//  add 4 item to map
+		//  print
+		//  validate top 2 printed
+		//  add new item to map that sorts to top
+		//  print
+		//  validate new top 2 printed
+	}
+
+	#[test]
+	fn head_limits_output_reversed() {
+		// TODO!
+		//  config { head: 2, reverse: true }
+		//  add 4 item to map
+		//  print
+		//  validate bottom 2 printed
+		//  add new item to map that sorts to top
+		//  print
+		//  validate new buttom 2 printed
 	}
 
 	#[test]

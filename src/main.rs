@@ -38,7 +38,11 @@ fn main() {
 		None => Box::new(BufWriter::new(stdout())),
 		Some(filename) => Box::new(BufWriter::new(File::open(filename).unwrap())),
 	};
-	let output_config = OutputConfig { debug: args.debug };
+	let output_config = OutputConfig {
+		reverse: args.reverse,
+		head: args.limit,
+		debug: args.debug,
+	};
 	let mut output = Output::new(output, output_config);
 
 	for line in input.lines() {
@@ -52,6 +56,8 @@ fn main() {
 	}
 }
 
+/// Replicating the behavior of `sort | uniq -c | sort -nr` with output that updates
+/// in real-time as each line is parsed.
 #[derive(Debug, StructOpt)]
 struct Args {
 	/// Case insensitive comparison of lines.
@@ -69,6 +75,14 @@ struct Args {
 	/// ignored.  Character numbers are one based, i.e., the first character is character one.
 	#[structopt(short = "s", default_value = "0", name = "chars")]
 	ignore_char_count: usize,
+
+	/// Displays the first count lines of output.
+	#[structopt(short, long, name = "count")]
+	limit: Option<usize>,
+
+	/// Reverse the output order showing items with the fewest counts at the top.
+	#[structopt(short, long)]
+	reverse: bool,
 
 	/// The input file to read, or "-" indicating to read stdin. If omitted, stdin will be used.
 	input_file: Option<String>,
