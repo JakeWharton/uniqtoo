@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::error::Error;
 use std::io::Write;
 
 pub struct Config {
@@ -22,7 +23,7 @@ impl Output {
 		}
 	}
 
-	pub fn print(&mut self, counts: &HashMap<String, u32>) {
+	pub fn print(&mut self, counts: &HashMap<String, u32>) -> Result<(), Box<dyn Error>> {
 		let mut pairs: Vec<(&String, &u32)> = counts.iter().collect();
 
 		// Sort items with higher counts to the top.
@@ -40,18 +41,18 @@ impl Output {
 			// For each previous line in the output, move the cursor up and clear the line.
 			self
 				.sink
-				.write_all("\u{001B}[F\u{001B}[K".repeat(self.last_height).as_ref())
-				.unwrap();
+				.write_all("\u{001B}[F\u{001B}[K".repeat(self.last_height).as_ref())?;
 		}
 		for (line, count) in &pairs {
 			self
 				.sink
-				.write_all(format!("{}\t{}\n", count, line).as_ref())
-				.unwrap();
+				.write_all(format!("{}\t{}\n", count, line).as_ref())?;
 		}
-		self.sink.flush().unwrap();
+		self.sink.flush()?;
 
 		self.last_height = pairs.len();
+
+		Ok(())
 	}
 }
 
