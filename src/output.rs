@@ -26,12 +26,10 @@ impl Output {
 
 		if !self.config.debug {
 			// For each previous line in the output, move the cursor up and clear the line.
-			for _ in 0..self.last_height {
-				self
-					.sink
-					.write_all("\u{001B}[F\u{001B}[K".as_ref())
-					.unwrap();
-			}
+			self
+				.sink
+				.write_all("\u{001B}[F\u{001B}[K".repeat(self.last_height).as_ref())
+				.unwrap();
 		}
 		for (line, count) in pairs {
 			self
