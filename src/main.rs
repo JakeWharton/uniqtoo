@@ -47,7 +47,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 		head: args.limit,
 		debug: args.debug,
 	};
-	let mut output = Output::new(Box::new(output.as_mut()), output_config);
+	let mut output = Output::new(output.as_mut(), output_config);
 
 	for line in input.lines() {
 		let line = line?;
