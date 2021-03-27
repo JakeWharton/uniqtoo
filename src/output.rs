@@ -9,13 +9,13 @@ pub struct Config {
 }
 
 pub struct Output<'a> {
-	sink: Box<&'a mut dyn Write>,
+	sink: &'a mut dyn Write,
 	config: Config,
 	last_height: usize,
 }
 
 impl<'a> Output<'a> {
-	pub fn new(sink: Box<&mut dyn Write>, config: Config) -> Output {
+	pub fn new(sink: &mut dyn Write, config: Config) -> Output {
 		Output {
 			sink,
 			config,
@@ -60,26 +60,28 @@ impl<'a> Output<'a> {
 mod tests {
 	use super::*;
 
-	#[test]
-	fn print_prints() {
-		//  add item to map
-		let mut counts = HashMap::new();
-		counts.insert("A".to_string(), 2);
-		counts.insert("B".to_string(), 1);
-		counts.insert("C".to_string(), 3);
+	fn print(config: Config, counts: &HashMap<String, u32>) -> Result<String, Box<dyn Error>> {
+		let mut sink = Vec::new();
+		let mut output = Output::new(&mut sink, config);
+		output.print(counts)?;
+		Ok(String::from_utf8(sink)?)
+	}
 
-		//  print
+	#[test]
+	fn print_prints() -> Result<(), Box<dyn Error>> {
 		let config = Config {
 			reverse: false,
 			head: None,
 			debug: false,
 		};
-		let mut sink = Vec::new();
-		let mut output = Output::new(Box::new(&mut sink), config);
 
-		output.print(&counts).unwrap();
+		let mut counts = HashMap::new();
+		counts.insert("A".to_string(), 2);
+		counts.insert("B".to_string(), 1);
+		counts.insert("C".to_string(), 3);
 
-		//  validate output is sorted
+		let actual = print(config, &counts)?;
+
 		let expected = "\
 3	C
 2	A
@@ -87,59 +89,187 @@ mod tests {
 "
 		.to_string();
 
-		assert_eq!(expected, String::from_utf8(sink).unwrap());
+		assert_eq!(expected, actual);
+		Ok(())
 	}
 
 	#[test]
-	fn print_reverse() {
-		// TODO!
-		//  config { reverse: true }
-		//  add item to map
-		//  print
-		//  validate output is sorted in reverse
+	fn print_reverse() -> Result<(), Box<dyn Error>> {
+		let config = Config {
+			reverse: true,
+			head: None,
+			debug: false,
+		};
+
+		let mut counts = HashMap::new();
+		counts.insert("A".to_string(), 2);
+		counts.insert("B".to_string(), 1);
+		counts.insert("C".to_string(), 3);
+
+		let actual = print(config, &counts)?;
+
+		let expected = "\
+1	B
+2	A
+3	C
+"
+		.to_string();
+
+		assert_eq!(expected, actual);
+		Ok(())
 	}
 
 	#[test]
-	fn print_clears_previous() {
-		// TODO!
-		//  add item to map
-		//  print
-		//  add new item to map
-		//  print
-		//  validate ANSI codes
+	fn print_clears_previous() -> Result<(), Box<dyn Error>> {
+		let config = Config {
+			reverse: false,
+			head: None,
+			debug: false,
+		};
+		let mut sink = Vec::new();
+		let mut output = Output::new(&mut sink, config);
+
+		let mut counts = HashMap::new();
+		counts.insert("A".to_string(), 1);
+		counts.insert("B".to_string(), 2);
+
+		output.print(&counts)?;
+
+		counts.insert("C".to_string(), 3);
+		counts.insert("D".to_string(), 4);
+
+		output.print(&counts)?;
+
+		let actual = String::from_utf8(sink)?;
+
+		let expected = "\
+2	B
+1	A
+\u{001B}[F\u{001B}[K\
+\u{001B}[F\u{001B}[K\
+4	D
+3	C
+2	B
+1	A
+"
+		.to_string();
+
+		assert_eq!(expected, actual);
+		Ok(())
 	}
 
 	#[test]
-	fn head_limits_output() {
-		// TODO!
-		//  config { head: 2 }
-		//  add 4 item to map
-		//  print
-		//  validate top 2 printed
-		//  add new item to map that sorts to top
-		//  print
-		//  validate new top 2 printed
+	fn head_limits_output() -> Result<(), Box<dyn Error>> {
+		let config = Config {
+			reverse: false,
+			head: Some(2),
+			debug: false,
+		};
+		let mut sink = Vec::new();
+		let mut output = Output::new(&mut sink, config);
+
+		let mut counts = HashMap::new();
+		counts.insert("A".to_string(), 1);
+		counts.insert("B".to_string(), 2);
+		counts.insert("C".to_string(), 3);
+		counts.insert("D".to_string(), 4);
+
+		output.print(&counts)?;
+
+		counts.insert("E".to_string(), 5);
+		counts.insert("F".to_string(), 6);
+
+		output.print(&counts)?;
+
+		let actual = String::from_utf8(sink)?;
+
+		let expected = "\
+4	D
+3	C
+\u{001B}[F\u{001B}[K\
+\u{001B}[F\u{001B}[K\
+6	F
+5	E
+"
+		.to_string();
+
+		assert_eq!(expected, actual);
+		Ok(())
 	}
 
 	#[test]
-	fn head_limits_output_reversed() {
-		// TODO!
-		//  config { head: 2, reverse: true }
-		//  add 4 item to map
-		//  print
-		//  validate bottom 2 printed
-		//  add new item to map that sorts to top
-		//  print
-		//  validate new buttom 2 printed
+	fn head_limits_output_reversed() -> Result<(), Box<dyn Error>> {
+		let config = Config {
+			reverse: true,
+			head: Some(2),
+			debug: false,
+		};
+		let mut sink = Vec::new();
+		let mut output = Output::new(&mut sink, config);
+
+		let mut counts = HashMap::new();
+		counts.insert("A".to_string(), 3);
+		counts.insert("B".to_string(), 4);
+		counts.insert("C".to_string(), 5);
+		counts.insert("D".to_string(), 6);
+
+		output.print(&counts)?;
+
+		counts.insert("E".to_string(), 1);
+		counts.insert("F".to_string(), 2);
+
+		output.print(&counts)?;
+
+		let actual = String::from_utf8(sink)?;
+
+		let expected = "\
+3	A
+4	B
+\u{001B}[F\u{001B}[K\
+\u{001B}[F\u{001B}[K\
+1	E
+2	F
+"
+		.to_string();
+
+		assert_eq!(expected, actual);
+		Ok(())
 	}
 
 	#[test]
-	fn debug_does_not_use_ansi_control_codes() {
-		// TODO!
-		//  add item to map
-		//  print
-		//  add new item to map
-		//  print
-		//  validate no ANSI codes are used
+	fn debug_does_not_use_ansi_control_codes() -> Result<(), Box<dyn Error>> {
+		let config = Config {
+			reverse: false,
+			head: None,
+			debug: true,
+		};
+		let mut sink = Vec::new();
+		let mut output = Output::new(&mut sink, config);
+
+		let mut counts = HashMap::new();
+		counts.insert("A".to_string(), 1);
+		counts.insert("B".to_string(), 2);
+
+		output.print(&counts)?;
+
+		counts.insert("C".to_string(), 3);
+		counts.insert("D".to_string(), 4);
+
+		output.print(&counts)?;
+
+		let actual = String::from_utf8(sink)?;
+
+		let expected = "\
+2	B
+1	A
+4	D
+3	C
+2	B
+1	A
+"
+		.to_string();
+
+		assert_eq!(expected, actual);
+		Ok(())
 	}
 }
