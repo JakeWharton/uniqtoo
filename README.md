@@ -42,7 +42,7 @@ A container with the binary is available from Docker Hub and GitHub Container Re
 Use `docker run` instead of directly using the binary.
 
 ```
-input_command | docker run -i -a STDIN -a STDOUT jakewharton/uniqtoo
+input_command | docker run --rm -i -a STDIN -a STDOUT jakewharton/uniqtoo
 ```
 
 ## License
