@@ -1,4 +1,4 @@
-FROM rust:1.84.1 as rust
+FROM rust:1.85.0 as rust
 
 RUN rustup component add clippy rustfmt
 WORKDIR /app
