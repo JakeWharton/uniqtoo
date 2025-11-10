@@ -15,7 +15,7 @@ pub struct Output<'a> {
 }
 
 impl<'a> Output<'a> {
-	pub fn new(sink: &mut dyn Write, config: Config) -> Output {
+	pub fn new(sink: &mut dyn Write, config: Config) -> Output<'_> {
 		Output {
 			sink,
 			config,
