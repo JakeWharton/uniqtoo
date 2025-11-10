@@ -10,7 +10,7 @@ use std::io::BufReader;
 use std::io::BufWriter;
 use std::io::Write;
 
-use structopt::StructOpt;
+use clap::Parser;
 
 mod counter;
 use counter::Config as CounterConfig;
@@ -21,7 +21,7 @@ use output::Config as OutputConfig;
 use output::Output;
 
 fn main() -> Result<(), Box<dyn Error>> {
-	let args: Args = Args::from_args();
+	let args: Args = Args::parse();
 	if args.debug {
 		dbg!(&args);
 	}
@@ -64,30 +64,30 @@ fn main() -> Result<(), Box<dyn Error>> {
 
 /// Replicating the behavior of `sort | uniq -c | sort -nr` with output that updates
 /// in real-time as each line is parsed.
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 struct Args {
 	/// Case insensitive comparison of lines.
-	#[structopt(short = "i")]
+	#[arg(short = 'i')]
 	case_insensitive: bool,
 
 	/// Ignore the first num fields in each input line when doing comparisons. A field is a string of
 	/// non-blank characters separated from adjacent fields by blanks. Field numbers are one based,
 	/// i.e., the first field is field one.
-	#[structopt(short = "f", default_value = "0", name = "num")]
+	#[arg(short = 'f', default_value = "0", name = "num")]
 	ignore_field_count: usize,
 
 	/// Ignore the first chars characters in each input line when doing comparisons. If specified in
 	/// conjunction with the -f option, the first chars characters after the first num fields will be
 	/// ignored.  Character numbers are one based, i.e., the first character is character one.
-	#[structopt(short = "s", default_value = "0", name = "chars")]
+	#[arg(short = 's', default_value = "0", name = "chars")]
 	ignore_char_count: usize,
 
 	/// Displays the first count lines of output.
-	#[structopt(short, long, name = "count")]
+	#[arg(short, long, name = "count")]
 	limit: Option<usize>,
 
 	/// Reverse the output order showing items with the fewest counts at the top.
-	#[structopt(short, long)]
+	#[arg(short, long)]
 	reverse: bool,
 
 	/// The input file to read, or "-" indicating to read stdin. If omitted, stdin will be used.
@@ -96,6 +96,6 @@ struct Args {
 	/// The output file to write. If omitted, stdout will be used.
 	output_file: Option<String>,
 
-	#[structopt(long, hidden = true)]
+	#[arg(long, hide = true)]
 	debug: bool,
 }
