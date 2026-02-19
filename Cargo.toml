@@ -11,7 +11,7 @@ categories = ["command-line-utilities"]
 exclude = [".github/**"]
 
 [dependencies]
-clap = { version = "4.5.59", features = ["derive"] }
+clap = { version = "4.5.60", features = ["derive"] }
 
 [profile.release]
 lto = true
