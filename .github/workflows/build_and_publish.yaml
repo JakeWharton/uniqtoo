@@ -117,7 +117,7 @@ jobs:
         with:
           command: publish
 
-      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.0.0
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           push: true
           tags: ${{ steps.docker_meta.outputs.tags }}
