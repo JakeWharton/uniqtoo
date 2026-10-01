@@ -12,20 +12,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.0
 
-      - uses: actions-rs/toolchain@v1.0.7
+      - uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
         with:
           toolchain: stable
           profile: minimal
           components: clippy
 
-      - uses: actions-rs/cargo@v1.0.3
+      - uses: actions-rs/cargo@844f36862e911db73fe0815f00a4a2602c279505 # v1.0.3
         name: cargo build
         with:
           command: build
 
-      - uses: actions-rs/clippy-check@v1
+      - uses: actions-rs/clippy-check@b5b5f21f4797c02da247df37026fcd0a5024aa4d # v1.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -33,14 +33,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.0
 
-      - uses: actions-rs/toolchain@v1.0.7
+      - uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
         with:
           toolchain: stable
           profile: minimal
 
-      - uses: actions-rs/cargo@v1.0.3
+      - uses: actions-rs/cargo@844f36862e911db73fe0815f00a4a2602c279505 # v1.0.3
         name: cargo build
         with:
           command: build
@@ -50,23 +50,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.0
       - run: docker build .
 
   rustfmt:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.0
 
-      - uses: actions-rs/toolchain@v1.0.7
+      - uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1.0.7
         with:
           toolchain: nightly
           override: true
           profile: minimal
           components: rustfmt
 
-      - uses: actions-rs/cargo@v1.0.3
+      - uses: actions-rs/cargo@844f36862e911db73fe0815f00a4a2602c279505 # v1.0.3
         name: cargo fmt
         with:
           command: fmt
